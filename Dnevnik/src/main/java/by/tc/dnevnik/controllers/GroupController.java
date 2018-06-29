@@ -29,5 +29,10 @@ public class GroupController {
 		CustomUserDetails cud = (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return repository.getGroupsByStatusAndTeacher(new GroupStatus(2L), new User(cud.getId()));
 	}
+	
+	@RequestMapping("/getAllGroups")
+	public Iterable<Group> getAllGroups() {
+		return repository.findAll();
+	}
 
 }

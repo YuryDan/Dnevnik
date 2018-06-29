@@ -11890,19 +11890,168 @@ class Find extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = { listAllGroups: [], listAllCourses: [], listAllTeachers: [], findList: [] };
         this.route = this.route.bind(this);
+        this.getAllGroups = this.getAllGroups.bind(this);
+        this.getAllCourses = this.getAllCourses.bind(this);
+        this.getAllteachers = this.getAllteachers.bind(this);
+        this.find = this.find.bind(this);
     }
 
     route(data) {
         this.props.history.push(data);
     }
 
+    componentDidMount() {
+        this.getAllGroups(this);
+        this.getAllCourses(this);
+        this.getAllteachers(this);
+    }
+
+    getAllGroups(e) {
+        $.ajax({
+            url: 'dnevnik/getAllGroups',
+            headers: client.createAuthorizationTokenHeader(),
+            success: function (data) {
+                this.setState({ listAllGroups: data });
+            }.bind(this),
+            error: function (jqXHR, textStatus, errorThrown) {
+                this.route('');
+            }.bind(this)
+
+        });
+    }
+    getAllCourses(e) {
+        $.ajax({
+            url: 'dnevnik/getAllCourses',
+            headers: client.createAuthorizationTokenHeader(),
+            success: function (data) {
+                this.setState({ listAllCourses: data });
+            }.bind(this),
+            error: function (jqXHR, textStatus, errorThrown) {
+                this.route('');
+            }.bind(this)
+
+        });
+    }
+    getAllteachers(e) {
+        $.ajax({
+            url: 'dnevnik/getAllTeachers',
+            headers: client.createAuthorizationTokenHeader(),
+            success: function (data) {
+                this.setState({ listAllTeachers: data });
+            }.bind(this),
+            error: function (jqXHR, textStatus, errorThrown) {
+                this.route('');
+            }.bind(this)
+
+        });
+    }
+
+    find(e) {
+        console.log($("#groupNumber").val());
+        console.log($("#course").val());
+        console.log($("#teacher").val());
+    }
+
     render() {
+        var groupNumbers = this.state.listAllGroups.map(group => {
+            return React.createElement('option', { value: group.number });
+        });
+        var courses = this.state.listAllCourses.map(course => {
+            return React.createElement('option', { value: course.type });
+        });
+        var teachers = this.state.listAllTeachers.map(teacher => {
+            return React.createElement('option', { value: teacher.surname + ' ' + teacher.name });
+        });
         return React.createElement(
             'div',
             { className: 'main' },
             React.createElement(Exit, { route: this.route }),
-            React.createElement(Menu, { route: this.route })
+            React.createElement(Menu, { route: this.route }),
+            React.createElement(
+                'div',
+                { className: 'page-content container' },
+                React.createElement(
+                    'div',
+                    { className: 'find-menu' },
+                    React.createElement(
+                        'div',
+                        { className: 'row' },
+                        React.createElement(
+                            'div',
+                            { className: 'col-sm-4 form-group' },
+                            React.createElement(
+                                'label',
+                                { className: 'label-find-menu' },
+                                '\u041D\u043E\u043C\u0435\u0440 \u0433\u0440\u0443\u043F\u043F\u044B'
+                            ),
+                            React.createElement('input', { type: 'text', id: 'groupNumber', list: 'numbers', className: 'form-control' }),
+                            React.createElement(
+                                'datalist',
+                                { id: 'numbers' },
+                                groupNumbers
+                            )
+                        ),
+                        React.createElement(
+                            'div',
+                            { className: 'col-sm-4' },
+                            React.createElement(
+                                'div',
+                                { className: 'form-group' },
+                                React.createElement(
+                                    'label',
+                                    { className: 'label-find-menu' },
+                                    '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043A\u0443\u0440\u0441\u0430'
+                                ),
+                                React.createElement('input', { type: 'text', id: 'course', list: 'courses', className: 'form-control' }),
+                                React.createElement(
+                                    'datalist',
+                                    { id: 'courses' },
+                                    courses
+                                )
+                            )
+                        ),
+                        React.createElement(
+                            'div',
+                            { className: 'col-sm-4' },
+                            React.createElement(
+                                'div',
+                                { className: 'form-group' },
+                                React.createElement(
+                                    'label',
+                                    { className: 'label-find-menu' },
+                                    '\u041F\u0440\u0435\u043F\u043E\u0434\u0430\u0432\u0430\u0442\u0435\u043B\u044C'
+                                ),
+                                React.createElement('input', { type: 'text', id: 'teacher', list: 'teachers', className: 'form-control' }),
+                                React.createElement(
+                                    'datalist',
+                                    { id: 'teachers' },
+                                    teachers
+                                )
+                            )
+                        )
+                    ),
+                    React.createElement(
+                        'div',
+                        { className: 'row' },
+                        React.createElement(
+                            'button',
+                            { className: 'btn btn-find-menu', onClick: this.find },
+                            '\u041D\u0430\u0439\u0442\u0438'
+                        )
+                    )
+                )
+            ),
+            React.createElement(
+                'div',
+                null,
+                this.state.findList.length != 0 ? React.createElement(
+                    'label',
+                    { className: 'control-label' },
+                    '\u0414\u0430'
+                ) : null
+            )
         );
     }
 };
