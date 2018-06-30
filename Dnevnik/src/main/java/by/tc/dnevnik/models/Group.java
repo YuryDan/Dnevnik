@@ -92,8 +92,6 @@ public class Group {
 		this.teacher = teacher;
 	}
 
-	
-
 	public Group(String number, Course course, Date startDate, Date finishDate, String days, String time, int duration,
 			int numberOfLessons, User teacher, GroupStatus status) {
 		this.number = number;
@@ -127,7 +125,7 @@ public class Group {
 	public String toString() {
 		return "Group [id=" + id + ", number=" + number + ", course=" + course + ", startDate=" + startDate
 				+ ", finishDate=" + finishDate + ", days=" + days + ", time=" + time + ", duration=" + duration
-				+ ", numberOfLessons=" + numberOfLessons + ", teacher=" + teacher + ", status=" + status + "]";
+				+ ", numberOfLessons=" + numberOfLessons + "]";
 	}
 
 	@Override
@@ -142,8 +140,6 @@ public class Group {
 		result = prime * result + ((number == null) ? 0 : number.hashCode());
 		result = prime * result + numberOfLessons;
 		result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
-		result = prime * result + ((status == null) ? 0 : status.hashCode());
-		result = prime * result + ((teacher == null) ? 0 : teacher.hashCode());
 		result = prime * result + ((time == null) ? 0 : time.hashCode());
 		return result;
 	}
@@ -190,16 +186,6 @@ public class Group {
 			if (other.startDate != null)
 				return false;
 		} else if (!startDate.equals(other.startDate))
-			return false;
-		if (status == null) {
-			if (other.status != null)
-				return false;
-		} else if (!status.equals(other.status))
-			return false;
-		if (teacher == null) {
-			if (other.teacher != null)
-				return false;
-		} else if (!teacher.equals(other.teacher))
 			return false;
 		if (time == null) {
 			if (other.time != null)
@@ -288,6 +274,11 @@ public class Group {
 
 	public User getTeacher() {
 		return teacher;
+	}
+	
+	@JsonProperty
+	public String getTeacherFIO() {
+	    return teacher == null ? null : teacher.getSurname() + " " + teacher.getName() + " " + teacher.getSecondName();
 	}
 
 	public void setTeacher(User teacher) {

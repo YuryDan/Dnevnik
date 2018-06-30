@@ -243,4 +243,12 @@ public class User implements Serializable {
 		this.lastPasswordResetDate = lastPasswordResetDate;
 	}
 
+	public List<Group> getListGroup() {
+		return listGroup;
+	}
+
+	public void setListGroup(List<Group> listGroup) {
+		this.listGroup = listGroup;
+	}
+
 }

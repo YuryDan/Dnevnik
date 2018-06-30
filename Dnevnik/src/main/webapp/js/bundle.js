@@ -11949,9 +11949,22 @@ class Find extends React.Component {
     }
 
     find(e) {
-        console.log($("#groupNumber").val());
-        console.log($("#course").val());
-        console.log($("#teacher").val());
+        $.ajax({
+            url: 'dnevnik/findBySeveralParam',
+            data: {
+                number: $("#groupNumber").val(),
+                course: $("#course").val(),
+                teacher: $("#teacher").val()
+            },
+            headers: client.createAuthorizationTokenHeader(),
+            success: function (data) {
+                this.setState({ findList: data });
+            }.bind(this),
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert('error');
+            }.bind(this)
+
+        });
     }
 
     render() {
@@ -11962,7 +11975,43 @@ class Find extends React.Component {
             return React.createElement('option', { value: course.type });
         });
         var teachers = this.state.listAllTeachers.map(teacher => {
-            return React.createElement('option', { value: teacher.surname + ' ' + teacher.name });
+            return React.createElement('option', { value: teacher.surname + ' ' + teacher.name + ' ' + teacher.secondName });
+        });
+        var findList = this.state.findList.map(group => {
+            return React.createElement(
+                'tr',
+                null,
+                React.createElement(
+                    'td',
+                    null,
+                    group.number
+                ),
+                React.createElement(
+                    'td',
+                    null,
+                    group.courseType
+                ),
+                React.createElement(
+                    'td',
+                    null,
+                    group.startDate
+                ),
+                React.createElement(
+                    'td',
+                    null,
+                    group.days
+                ),
+                React.createElement(
+                    'td',
+                    null,
+                    group.time
+                ),
+                React.createElement(
+                    'td',
+                    null,
+                    group.teacherFIO
+                )
+            );
         });
         return React.createElement(
             'div',
@@ -12040,17 +12089,67 @@ class Find extends React.Component {
                             { className: 'btn btn-find-menu', onClick: this.find },
                             '\u041D\u0430\u0439\u0442\u0438'
                         )
-                    )
+                    ),
+                    this.state.findList.length != 0 ? React.createElement(
+                        'div',
+                        null,
+                        React.createElement('br', null),
+                        React.createElement('br', null),
+                        React.createElement(
+                            'label',
+                            { className: 'label-find-menu' },
+                            '\u041D\u0430\u0439\u0434\u0435\u043D\u043E \u0433\u0440\u0443\u043F\u043F: ',
+                            findList.length
+                        ),
+                        React.createElement(
+                            'table',
+                            { className: 'table table-bordered table-find-menu' },
+                            React.createElement(
+                                'thead',
+                                null,
+                                React.createElement(
+                                    'tr',
+                                    null,
+                                    React.createElement(
+                                        'th',
+                                        null,
+                                        '\u041D\u043E\u043C\u0435\u0440 \u0433\u0440\u0443\u043F\u043F\u044B'
+                                    ),
+                                    React.createElement(
+                                        'th',
+                                        null,
+                                        '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043A\u0443\u0440\u0441\u0430'
+                                    ),
+                                    React.createElement(
+                                        'th',
+                                        null,
+                                        '\u0414\u0430\u0442\u0430 \u043D\u0430\u0447\u0430\u043B\u0430'
+                                    ),
+                                    React.createElement(
+                                        'th',
+                                        null,
+                                        '\u0414\u043D\u0438 \u0437\u0430\u043D\u044F\u0442\u0438\u0439'
+                                    ),
+                                    React.createElement(
+                                        'th',
+                                        null,
+                                        '\u0412\u0440\u0435\u043C\u044F \u043F\u0440\u043E\u0432\u0435\u0434\u0435\u043D\u0438\u044F'
+                                    ),
+                                    React.createElement(
+                                        'th',
+                                        null,
+                                        '\u041F\u0440\u0435\u043F\u043E\u0434\u0430\u0432\u0430\u0442\u0435\u043B\u044C'
+                                    )
+                                )
+                            ),
+                            React.createElement(
+                                'tbody',
+                                null,
+                                findList
+                            )
+                        )
+                    ) : null
                 )
-            ),
-            React.createElement(
-                'div',
-                null,
-                this.state.findList.length != 0 ? React.createElement(
-                    'label',
-                    { className: 'control-label' },
-                    '\u0414\u0430'
-                ) : null
             )
         );
     }

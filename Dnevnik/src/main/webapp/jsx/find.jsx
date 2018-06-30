@@ -67,9 +67,22 @@ class Find extends React.Component {
     }
 
     find(e){
-        console.log($("#groupNumber").val());
-        console.log($("#course").val());
-        console.log($("#teacher").val());
+         $.ajax({
+            url: 'dnevnik/findBySeveralParam',
+            data: {
+                number : $("#groupNumber").val(),
+                course : $("#course").val(),
+                teacher : $("#teacher").val()
+            },
+			headers: client.createAuthorizationTokenHeader(),
+            success: function(data){ 
+                this.setState({findList:data});
+			}.bind(this),
+			error: function (jqXHR, textStatus, errorThrown) {
+                alert('error');
+            }.bind(this)
+            
+        });
     }
     
     render() {
@@ -85,7 +98,19 @@ class Find extends React.Component {
         });
         var teachers = this.state.listAllTeachers.map((teacher)=> {
             return (
-                <option value={teacher.surname + ' ' + teacher.name}></option>
+                <option value={teacher.surname + ' ' + teacher.name + ' ' + teacher.secondName}></option>
+            );
+        });
+        var findList = this.state.findList.map((group)=> {
+            return (
+                <tr>
+			      <td>{group.number}</td>
+			      <td>{group.courseType}</td>
+			      <td>{group.startDate}</td>
+			      <td>{group.days}</td>
+			      <td>{group.time}</td>
+                  <td>{group.teacherFIO}</td>
+			    </tr>
             );
         });
         return (
@@ -124,15 +149,31 @@ class Find extends React.Component {
                         <div className="row">
                             <button className="btn btn-find-menu" onClick={this.find}>Найти</button>
                         </div>
+                        {
+                            this.state.findList.length != 0 ?
+                                <div>
+                                    <br/><br/>
+                                    <label className="label-find-menu">Найдено групп: {findList.length}</label>
+                                    <table className="table table-bordered table-find-menu">
+                                        <thead>
+                                            <tr>
+                                                <th>Номер группы</th>
+                                                <th>Название курса</th>
+                                                <th>Дата начала</th>
+                                                <th>Дни занятий</th>
+                                                <th>Время проведения</th>
+                                                <th>Преподаватель</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {findList}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                :
+                                null
+                        }
                     </div>
-                </div>
-                <div>
-                    {
-                        this.state.findList.length != 0 ?
-                            <label className="control-label">Да</label> 
-                            :
-                            null
-                    }
                 </div>
             </div>
         );

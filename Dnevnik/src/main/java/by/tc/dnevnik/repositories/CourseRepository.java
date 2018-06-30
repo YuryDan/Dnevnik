@@ -6,4 +6,6 @@ import by.tc.dnevnik.models.Course;
 
 public interface CourseRepository  extends JpaRepository<Course, Long> {
 	
+	Course findByType(String type);
+	
 }
