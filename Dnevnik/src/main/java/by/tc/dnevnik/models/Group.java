@@ -26,7 +26,7 @@ public class Group {
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "number", nullable = false, unique = true)
+	@Column(name = "number", /*nullable = false,*/ unique = true)
 	private String number;
 
 	@ManyToOne(fetch = FetchType.LAZY)

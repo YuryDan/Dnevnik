@@ -16,17 +16,6 @@ public interface GroupRepository  extends JpaRepository<Group, Long> {
 	@Query("SELECT m FROM Group m WHERE m.status = :status AND m.teacher = :teacher")
 	Iterable<Group> getGroupsByStatusAndTeacher(@Param("status") GroupStatus status, @Param("teacher") User teacher);
 	
-	@Query("SELECT m FROM Group m WHERE m.number LIKE %:number% AND m.teacher LIKE %:teacher%")
-	List<Group> findBySeveralParam(@Param("number") String number, @Param("teacher") User teacher);
-	
-	//@Query("SELECT m FROM Group m WHERE m.number LIKE %:number% AND m.teacher LIKE %:teacher%")
-	//List<Group> findBySeveral(@Param("number") String number);
-	
-	List<Group> findByNumber(String number);
-	List<Group> findByCourse(Course course);
-	List<Group> findByTeacher(User teacher);
-	List<Group> findByNumberAndCourse(String number, Course course);
-	List<Group> findByNumberAndTeacher(String number, User teacher);
-	List<Group> findByCourseAndTeacher(Course course, User teacher);
-	List<Group> findByNumberAndCourseAndTeacher(String number, Course course, User teacher);
+	@Query("SELECT m FROM Group m WHERE (?2 is null or m.teacher LIKE CONCAT('%',?2,'%')) AND (?1 is null or m.number LIKE CONCAT('%',?1,'%')) AND (?3 is null or m.course LIKE CONCAT('%',?3,'%'))")
+	List<Group> findBySeveralParam(@Param("number") String number, @Param("teacher") User teacher, @Param("course") Course course);
 }
