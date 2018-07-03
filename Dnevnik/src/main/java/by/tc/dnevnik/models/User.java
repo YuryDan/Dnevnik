@@ -21,6 +21,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "users")
@@ -229,6 +230,11 @@ public class User implements Serializable {
 
 	public Role getRole() {
 		return role;
+	}
+	
+	@JsonProperty
+	public String getRoleType() {
+	    return role == null ? null : role.getType();
 	}
 
 	public void setRole(Role role) {

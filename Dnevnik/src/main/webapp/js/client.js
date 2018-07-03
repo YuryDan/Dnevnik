@@ -1,4 +1,5 @@
 var TOKEN_KEY = "jwtToken"
+var GROUP_ID = ''
 
 function setJwtToken(token) {
     localStorage.setItem(TOKEN_KEY, token);
@@ -23,10 +24,20 @@ function createAuthorizationTokenHeader() {
     }
 }
 
+function setGroupId(id) {
+    localStorage.setItem(GROUP_ID, id);
+}
+
+function getGroupId() {
+    return localStorage.getItem(GROUP_ID);
+}
+
 export {
     TOKEN_KEY,
     setJwtToken,
     getJwtToken,
+    setGroupId,
+    getGroupId,
     removeJwtToken,
     createAuthorizationTokenHeader
 };

@@ -18,9 +18,9 @@ public class Main {
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection cn = DriverManager.getConnection("jdbc:mysql://127.0.0.1/dnevnik", "root", "root");
 			Statement st = cn.createStatement();
-			st.executeUpdate("INSERT INTO roles VALUES(1, 'admin')");
-			st.executeUpdate("INSERT INTO roles VALUES(2, 'manager')");
-			st.executeUpdate("INSERT INTO roles VALUES(3, 'teacher')");
+			/*st.executeUpdate("INSERT INTO roles VALUES(1, 'ROLE_ADMIN')");
+			st.executeUpdate("INSERT INTO roles VALUES(2, 'ROLE_MANAGER')");
+			st.executeUpdate("INSERT INTO roles VALUES(3, 'ROLE_USER')");
 			
 			st.executeUpdate("INSERT INTO courses VALUES(1, 'Java SE')");
 			st.executeUpdate("INSERT INTO courses VALUES(2, 'C#')");
@@ -47,7 +47,14 @@ public class Main {
 			st.executeUpdate("INSERT INTO groups VALUES(9, 'Понедельник, пятница', 2, now(), '32-2018', 44, now(), '12.00', 4, 1, 5)");
 			st.executeUpdate("INSERT INTO groups VALUES(10, 'Понедельник, пятница', 2, now(), '33-2018', 44, now(), '12.00', 4, 1, 5)");
 			st.executeUpdate("INSERT INTO groups VALUES(11, 'Понедельник, пятница', 2, now(), '34-2018', 44, now(), '12.00', 4, 1, 5)");
-			st.executeUpdate("INSERT INTO groups VALUES(12, 'Понедельник, пятница', 2, now(), '35-2018', 44, now(), '12.00', 4, 1, 5)");
+			st.executeUpdate("INSERT INTO groups VALUES(12, 'Понедельник, пятница', 2, now(), '35-2018', 44, now(), '12.00', 4, 1, 5)");*/
+			
+			st.executeUpdate("INSERT INTO students VALUES(1, '1Ahmed1', '1Ahmed2', '1Ahmed3')");
+			st.executeUpdate("INSERT INTO students VALUES(2, '2Ahmed1', '2Ahmed2', '2Ahmed3')");
+			st.executeUpdate("INSERT INTO students VALUES(3, '3Ahmed1', '3Ahmed2', '3Ahmed3')");
+			st.executeUpdate("INSERT INTO students VALUES(4, '4Ahmed1', '4Ahmed2', '4Ahmed3')");
+			st.executeUpdate("INSERT INTO students VALUES(5, '5Ahmed1', '5Ahmed2', '5Ahmed3')");
+			st.executeUpdate("INSERT INTO students VALUES(6, '6Ahmed1', '6Ahmed2', '6Ahmed3')");
 			
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();

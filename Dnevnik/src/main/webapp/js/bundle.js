@@ -3122,9 +3122,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TOKEN_KEY", function() { return TOKEN_KEY; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setJwtToken", function() { return setJwtToken; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getJwtToken", function() { return getJwtToken; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setGroupId", function() { return setGroupId; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getGroupId", function() { return getGroupId; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeJwtToken", function() { return removeJwtToken; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createAuthorizationTokenHeader", function() { return createAuthorizationTokenHeader; });
 var TOKEN_KEY = "jwtToken";
+var GROUP_ID = '';
 
 function setJwtToken(token) {
     localStorage.setItem(TOKEN_KEY, token);
@@ -3147,6 +3150,14 @@ function createAuthorizationTokenHeader() {
     } else {
         return {};
     }
+}
+
+function setGroupId(id) {
+    localStorage.setItem(GROUP_ID, id);
+}
+
+function getGroupId() {
+    return localStorage.getItem(GROUP_ID);
 }
 
 
@@ -11862,6 +11873,7 @@ const Index = __webpack_require__(109);
 const Main = __webpack_require__(110);
 const Group = __webpack_require__(108);
 const Find = __webpack_require__(107);
+const Admin = __webpack_require__(242);
 
 ReactDOM.render(React.createElement(
     BrowserRouter,
@@ -11872,7 +11884,8 @@ ReactDOM.render(React.createElement(
         React.createElement(Route, { exact: true, path: '/', component: Index }),
         React.createElement(Route, { path: '/main', component: Main }),
         React.createElement(Route, { path: '/group', component: Group }),
-        React.createElement(Route, { path: '/find', component: Find })
+        React.createElement(Route, { path: '/find', component: Find }),
+        React.createElement(Route, { path: '/admin', component: Admin })
     )
 ), document.getElementById('content'));
 
@@ -11890,12 +11903,13 @@ class Find extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { listAllGroups: [], listAllCourses: [], listAllTeachers: [], findList: [] };
+        this.state = { listAllGroups: [], listAllCourses: [], listAllTeachers: [], findList: [], labelFindCount: 0 };
         this.route = this.route.bind(this);
         this.getAllGroups = this.getAllGroups.bind(this);
         this.getAllCourses = this.getAllCourses.bind(this);
         this.getAllteachers = this.getAllteachers.bind(this);
         this.find = this.find.bind(this);
+        this.groupPage = this.groupPage.bind(this);
     }
 
     route(data) {
@@ -11906,6 +11920,11 @@ class Find extends React.Component {
         this.getAllGroups(this);
         this.getAllCourses(this);
         this.getAllteachers(this);
+    }
+
+    groupPage(group) {
+        client.setGroupId(group.id);
+        this.route('group');
     }
 
     getAllGroups(e) {
@@ -11959,6 +11978,7 @@ class Find extends React.Component {
             headers: client.createAuthorizationTokenHeader(),
             success: function (data) {
                 this.setState({ findList: data });
+                this.setState({ labelFindCount: 1 });
             }.bind(this),
             error: function (jqXHR, textStatus, errorThrown) {
                 alert('error');
@@ -11971,16 +11991,16 @@ class Find extends React.Component {
         var groupNumbers = this.state.listAllGroups.map(group => {
             return React.createElement('option', { value: group.number });
         });
-        var courses = this.state.listAllCourses.map(course => {
+        var coursesMap = this.state.listAllCourses.map(course => {
             return React.createElement('option', { value: course.type });
         });
-        var teachers = this.state.listAllTeachers.map(teacher => {
+        var teachersMap = this.state.listAllTeachers.map(teacher => {
             return React.createElement('option', { value: teacher.surname + ' ' + teacher.name + ' ' + teacher.secondName });
         });
-        var findList = this.state.findList.map(group => {
+        var findListMap = this.state.findList.map(group => {
             return React.createElement(
                 'tr',
-                null,
+                { onClick: () => this.groupPage(group) },
                 React.createElement(
                     'td',
                     null,
@@ -12057,7 +12077,7 @@ class Find extends React.Component {
                                 React.createElement(
                                     'datalist',
                                     { id: 'courses' },
-                                    courses
+                                    coursesMap
                                 )
                             )
                         ),
@@ -12076,7 +12096,7 @@ class Find extends React.Component {
                                 React.createElement(
                                     'datalist',
                                     { id: 'teachers' },
-                                    teachers
+                                    teachersMap
                                 )
                             )
                         )
@@ -12090,7 +12110,7 @@ class Find extends React.Component {
                             '\u041D\u0430\u0439\u0442\u0438'
                         )
                     ),
-                    this.state.findList.length != 0 ? React.createElement(
+                    this.state.labelFindCount != 0 ? React.createElement(
                         'div',
                         null,
                         React.createElement('br', null),
@@ -12099,8 +12119,12 @@ class Find extends React.Component {
                             'label',
                             { className: 'label-find-menu' },
                             '\u041D\u0430\u0439\u0434\u0435\u043D\u043E \u0433\u0440\u0443\u043F\u043F: ',
-                            findList.length
-                        ),
+                            this.state.findList.length
+                        )
+                    ) : null,
+                    this.state.findList.length != 0 ? React.createElement(
+                        'div',
+                        null,
                         React.createElement(
                             'table',
                             { className: 'table table-bordered table-find-menu' },
@@ -12145,7 +12169,7 @@ class Find extends React.Component {
                             React.createElement(
                                 'tbody',
                                 null,
-                                findList
+                                findListMap
                             )
                         )
                     ) : null
@@ -12163,27 +12187,56 @@ module.exports = Find;
 const React = __webpack_require__(6);
 const Menu = __webpack_require__(41);
 const Exit = __webpack_require__(40);
+const GroupInfo = __webpack_require__(239);
+const GroupUsersInfo = __webpack_require__(240);
 
 const client = __webpack_require__(24);
 
 class Group extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.route = this.route.bind(this);
-    }
-    route(data) {
-        this.props.history.push(data);
-    }
+				constructor(props) {
+								super(props);
+								this.state = { group: [], groupId: client.getGroupId() };
+								this.route = this.route.bind(this);
+								this.getInfoAboutGroup = this.getInfoAboutGroup.bind(this);
+				}
 
-    render() {
-        return React.createElement(
-            'div',
-            { className: 'main' },
-            React.createElement(Exit, { route: this.route }),
-            React.createElement(Menu, { route: this.route })
-        );
-    }
+				componentDidMount() {
+								this.getInfoAboutGroup(this);
+				}
+
+				route(data) {
+								this.props.history.push(data);
+				}
+
+				getInfoAboutGroup(e) {
+								$.ajax({
+												url: 'dnevnik/getInfoAboutGroup',
+												data: {
+																id: this.state.groupId
+												},
+												headers: client.createAuthorizationTokenHeader(),
+												success: function (data) {
+																this.setState({ group: data });
+												}.bind(this),
+												error: function () {
+																this.route('');
+												}.bind(this)
+
+								});
+				}
+
+				render() {
+								return React.createElement(
+												'div',
+												{ className: 'main' },
+												React.createElement(Exit, { route: this.route }),
+												React.createElement(Menu, { route: this.route }),
+												React.createElement(GroupInfo, { route: this.route }),
+												React.createElement('br', null),
+												React.createElement(GroupUsersInfo, { route: this.route })
+								);
+				}
 };
 module.exports = Group;
 
@@ -12277,6 +12330,7 @@ const React = __webpack_require__(6);
 
 const Menu = __webpack_require__(41);
 const Exit = __webpack_require__(40);
+const GodMod = __webpack_require__(241);
 const client = __webpack_require__(24);
 
 class Main extends React.Component {
@@ -12293,7 +12347,8 @@ class Main extends React.Component {
 		this.props.history.push(data);
 	}
 
-	groupPage(data) {
+	groupPage(group) {
+		client.setGroupId(group.id);
 		this.route('group');
 	}
 
@@ -12333,7 +12388,7 @@ class Main extends React.Component {
 		var listActiveGroups = this.state.listActiveGroups.map(activeGroup => {
 			return React.createElement(
 				'tr',
-				{ onClick: this.groupPage },
+				{ onClick: () => this.groupPage(activeGroup) },
 				React.createElement(
 					'td',
 					null,
@@ -12364,7 +12419,7 @@ class Main extends React.Component {
 		var listCompleteGroups = this.state.listCompleteGroups.map(completeGroup => {
 			return React.createElement(
 				'tr',
-				{ onClick: this.groupPage },
+				{ onClick: () => this.groupPage(completeGroup) },
 				React.createElement(
 					'td',
 					null,
@@ -12396,6 +12451,7 @@ class Main extends React.Component {
 			'div',
 			{ className: 'main' },
 			React.createElement(Exit, { route: this.route }),
+			React.createElement(GodMod, { route: this.route }),
 			React.createElement(Menu, { route: this.route }),
 			React.createElement(
 				'div',
@@ -27762,6 +27818,521 @@ module.exports = traverseAllChildren;
 
 module.exports = __webpack_require__(106);
 
+
+/***/ }),
+/* 239 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const React = __webpack_require__(6);
+
+const client = __webpack_require__(24);
+
+class GroupInfo extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = { group: [], groupId: client.getGroupId() };
+        this.route = this.route.bind(this);
+        this.getInfoAboutGroup = this.getInfoAboutGroup.bind(this);
+    }
+
+    componentDidMount() {
+        this.getInfoAboutGroup(this);
+    }
+
+    route(e) {
+        this.props.route(e.target.name);
+    }
+
+    getInfoAboutGroup(e) {
+        $.ajax({
+            url: 'dnevnik/getInfoAboutGroup',
+            data: {
+                id: this.state.groupId
+            },
+            headers: client.createAuthorizationTokenHeader(),
+            success: function (data) {
+                this.setState({ group: data });
+            }.bind(this),
+            error: function () {
+                this.route('');
+            }.bind(this)
+
+        });
+    }
+
+    render() {
+        return React.createElement(
+            'div',
+            { className: 'page-content container' },
+            React.createElement(
+                'div',
+                { className: 'group-info' },
+                React.createElement(
+                    'div',
+                    { className: 'row' },
+                    React.createElement(
+                        'div',
+                        { className: 'col-md-12' },
+                        React.createElement(
+                            'div',
+                            { className: 'group-info-one-row' },
+                            React.createElement(
+                                'div',
+                                { className: 'row' },
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    React.createElement(
+                                        'label',
+                                        { className: 'group-info-label' },
+                                        '\u041D\u043E\u043C\u0435\u0440 \u0433\u0440\u0443\u043F\u043F\u044B:\xA0\xA0'
+                                    )
+                                ),
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    this.state.group.number
+                                )
+                            )
+                        ),
+                        React.createElement(
+                            'div',
+                            { className: 'group-info-one-row' },
+                            React.createElement(
+                                'div',
+                                { className: 'row' },
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    React.createElement(
+                                        'label',
+                                        { className: 'group-info-label' },
+                                        '\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043A\u0443\u0440\u0441\u0430:\xA0\xA0'
+                                    )
+                                ),
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    this.state.group.courseType
+                                )
+                            )
+                        ),
+                        React.createElement(
+                            'div',
+                            { className: 'group-info-one-row' },
+                            React.createElement(
+                                'div',
+                                { className: 'row' },
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    React.createElement(
+                                        'label',
+                                        { className: 'group-info-label' },
+                                        '\u041F\u0440\u0435\u043F\u043E\u0434\u0430\u0432\u0430\u0442\u0435\u043B\u044C:\xA0\xA0'
+                                    )
+                                ),
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    this.state.group.teacherFIO
+                                )
+                            )
+                        ),
+                        React.createElement(
+                            'div',
+                            { className: 'group-info-one-row' },
+                            React.createElement(
+                                'div',
+                                { className: 'row' },
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    React.createElement(
+                                        'label',
+                                        { className: 'group-info-label' },
+                                        '\u0414\u043D\u0438 \u0437\u0430\u043D\u044F\u0442\u0438\u0439:\xA0\xA0'
+                                    )
+                                ),
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    this.state.group.days
+                                )
+                            )
+                        ),
+                        React.createElement(
+                            'div',
+                            { className: 'group-info-one-row' },
+                            React.createElement(
+                                'div',
+                                { className: 'row' },
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    React.createElement(
+                                        'label',
+                                        { className: 'group-info-label' },
+                                        '\u041D\u0430\u0447\u0430\u043B\u043E \u043A\u0443\u0440\u0441\u0430:\xA0\xA0'
+                                    )
+                                ),
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    this.state.group.startDate
+                                )
+                            )
+                        ),
+                        React.createElement(
+                            'div',
+                            { className: 'group-info-one-row' },
+                            React.createElement(
+                                'div',
+                                { className: 'row' },
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    React.createElement(
+                                        'label',
+                                        { className: 'group-info-label' },
+                                        '\u041A\u043E\u043D\u0435\u0446 \u043A\u0443\u0440\u0441\u0430:\xA0\xA0'
+                                    )
+                                ),
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    this.state.group.finishDate
+                                )
+                            )
+                        ),
+                        React.createElement(
+                            'div',
+                            { className: 'group-info-one-row' },
+                            React.createElement(
+                                'div',
+                                { className: 'row' },
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    React.createElement(
+                                        'label',
+                                        { className: 'group-info-label' },
+                                        '\u041A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u0437\u0430\u043D\u044F\u0442\u0438\u0439:\xA0\xA0'
+                                    )
+                                ),
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    this.state.group.numberOfLessons
+                                )
+                            )
+                        ),
+                        React.createElement(
+                            'div',
+                            null,
+                            React.createElement(
+                                'div',
+                                { className: 'row' },
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    React.createElement(
+                                        'label',
+                                        { className: 'group-info-label' },
+                                        '\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C \u0437\u0430\u043D\u044F\u0442\u0438\u044F:\xA0\xA0'
+                                    )
+                                ),
+                                React.createElement(
+                                    'div',
+                                    { className: 'col-sm-6 group-info-one-col' },
+                                    this.state.group.duration,
+                                    '\u0430.\u0447.'
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+    }
+};
+module.exports = GroupInfo;
+
+/***/ }),
+/* 240 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const React = __webpack_require__(6);
+
+const client = __webpack_require__(24);
+
+class GroupUsersInfo extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = { groupUsers: [], groupId: client.getGroupId() };
+        this.route = this.route.bind(this);
+        this.getInfoAboutGroupUsers = this.getInfoAboutGroupUsers.bind(this);
+    }
+
+    componentDidMount() {
+        this.getInfoAboutGroupUsers(this);
+    }
+
+    route(e) {
+        this.props.route(e.target.name);
+    }
+
+    getInfoAboutGroupUsers(e) {
+        $.ajax({
+            url: 'dnevnik/getInfoAboutGroupUsers',
+            data: {
+                id: this.state.groupId
+            },
+            headers: client.createAuthorizationTokenHeader(),
+            success: function (data) {
+                this.setState({ groupUsers: data });
+            }.bind(this),
+            error: function () {
+                this.route('');
+            }.bind(this)
+
+        });
+    }
+
+    render() {
+        var getUsers = this.state.groupUsers.map((user, index) => {
+            return React.createElement(
+                'tr',
+                null,
+                React.createElement(
+                    'td',
+                    null,
+                    index + 1
+                ),
+                React.createElement(
+                    'td',
+                    null,
+                    user.name + ' ' + user.surname + ' ' + user.secondName
+                )
+            );
+        });
+        return React.createElement(
+            'div',
+            { className: 'page-content container' },
+            this.state.groupUsers.length != 0 ? React.createElement(
+                'div',
+                { className: 'group-info-table' },
+                React.createElement(
+                    'table',
+                    { className: 'table table-bordered' },
+                    React.createElement(
+                        'thead',
+                        null,
+                        React.createElement(
+                            'tr',
+                            null,
+                            React.createElement(
+                                'th',
+                                null,
+                                '\u2116'
+                            ),
+                            React.createElement(
+                                'th',
+                                null,
+                                '\u0424\u0418\u041E'
+                            )
+                        )
+                    ),
+                    React.createElement(
+                        'tbody',
+                        null,
+                        getUsers
+                    )
+                )
+            ) : null
+        );
+    }
+};
+module.exports = GroupUsersInfo;
+
+/***/ }),
+/* 241 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const React = __webpack_require__(6);
+
+const client = __webpack_require__(24);
+
+class GodMod extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.godMod = this.godMod.bind(this);
+    }
+    godMod() {
+        $.ajax({
+            url: 'dnevnik/godMod',
+            headers: client.createAuthorizationTokenHeader(),
+            success: function (data) {
+                this.props.route('admin');
+            }.bind(this),
+            error: function () {
+                this.props.route('main');
+            }.bind(this)
+
+        });
+    }
+
+    render() {
+        return React.createElement(
+            'button',
+            { type: 'button', className: 'btn btn-reg', onClick: this.godMod },
+            'GodMod'
+        );
+    }
+};
+module.exports = GodMod;
+
+/***/ }),
+/* 242 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const React = __webpack_require__(6);
+const Menu = __webpack_require__(41);
+const Exit = __webpack_require__(40);
+
+const client = __webpack_require__(24);
+
+class Admin extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = { listAllUsers: [] };
+        this.route = this.route.bind(this);
+        this.getAllUsers = this.getAllUsers.bind(this);
+    }
+
+    componentDidMount() {
+        this.getAllUsers(this);
+    }
+
+    route(data) {
+        this.props.history.push(data);
+    }
+
+    getAllUsers(e) {
+        $.ajax({
+            url: 'dnevnik/getAllUsers',
+            headers: client.createAuthorizationTokenHeader(),
+            success: function (data) {
+                this.setState({ listAllUsers: data });
+            }.bind(this),
+            error: function () {
+                this.route('main');
+            }.bind(this)
+
+        });
+    }
+
+    render() {
+        var allUsers = this.state.listAllUsers.map(user => {
+            return React.createElement(
+                'tr',
+                null,
+                React.createElement(
+                    'td',
+                    null,
+                    user.id
+                ),
+                React.createElement(
+                    'td',
+                    null,
+                    user.name
+                ),
+                React.createElement(
+                    'td',
+                    null,
+                    user.surname
+                ),
+                React.createElement(
+                    'td',
+                    null,
+                    user.secondName
+                ),
+                React.createElement(
+                    'td',
+                    null,
+                    user.email
+                ),
+                React.createElement(
+                    'td',
+                    null,
+                    user.roleType
+                )
+            );
+        });
+        return React.createElement(
+            'div',
+            { className: 'main' },
+            React.createElement(Exit, { route: this.route }),
+            React.createElement(Menu, { route: this.route }),
+            React.createElement(
+                'div',
+                { className: 'page-content container' },
+                React.createElement(
+                    'table',
+                    { className: 'table table-bordered' },
+                    React.createElement(
+                        'thead',
+                        null,
+                        React.createElement(
+                            'tr',
+                            null,
+                            React.createElement(
+                                'th',
+                                null,
+                                'ID'
+                            ),
+                            React.createElement(
+                                'th',
+                                null,
+                                '\u0418\u043C\u044F'
+                            ),
+                            React.createElement(
+                                'th',
+                                null,
+                                '\u0424\u0430\u043C\u0438\u043B\u0438\u044F'
+                            ),
+                            React.createElement(
+                                'th',
+                                null,
+                                '\u041E\u0442\u0447\u0435\u0441\u0442\u0432\u043E'
+                            ),
+                            React.createElement(
+                                'th',
+                                null,
+                                'E-mail'
+                            ),
+                            React.createElement(
+                                'th',
+                                null,
+                                '\u0420\u043E\u043B\u044C'
+                            )
+                        )
+                    ),
+                    React.createElement(
+                        'tbody',
+                        null,
+                        allUsers
+                    )
+                )
+            )
+        );
+    }
+};
+module.exports = Admin;
 
 /***/ })
 /******/ ]);

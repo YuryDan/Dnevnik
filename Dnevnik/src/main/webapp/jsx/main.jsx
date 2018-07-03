@@ -2,6 +2,7 @@ const React = require( 'react' )
 
 const Menu = require( './menu.jsx' )
 const Exit = require( './exit.jsx' )
+const GodMod = require( './godMod.jsx' )
 const client = require('../js/client.js')
 
 class Main extends React.Component {
@@ -18,13 +19,14 @@ class Main extends React.Component {
 		this.props.history.push( data );
 	}
 
-	groupPage(data){
+	groupPage(group){
+		client.setGroupId(group.id);
 		this.route( 'group' );
 	}
     
     componentDidMount(){ 
         this.getActiveGroups(this);
-        this.getCompleteGroups(this);
+		this.getCompleteGroups(this);
     }
     
     getActiveGroups(e){
@@ -57,18 +59,18 @@ class Main extends React.Component {
     render() {
     	var listActiveGroups = this.state.listActiveGroups.map((activeGroup)=> {
             return (
-                <tr onClick={this.groupPage}>
-			      <td>{activeGroup.number}</td>
-			      <td>{activeGroup.courseType}</td>
-			      <td>{activeGroup.startDate}</td>
-			      <td>{activeGroup.days}</td>
-			      <td>{activeGroup.time}</td>
-			    </tr>
+				<tr onClick={()=>this.groupPage(activeGroup)}>
+					<td>{activeGroup.number}</td>
+					<td>{activeGroup.courseType}</td>
+					<td>{activeGroup.startDate}</td>
+					<td>{activeGroup.days}</td>
+					<td>{activeGroup.time}</td>
+				</tr>
             );
         });
         var listCompleteGroups = this.state.listCompleteGroups.map((completeGroup)=> {
             return (
-                <tr onClick={this.groupPage}>
+                <tr onClick={()=>this.groupPage(completeGroup)}>
 			      <td>{completeGroup.number}</td>
 			      <td>{completeGroup.courseType}</td>
 			      <td>{completeGroup.startDate}</td>
@@ -80,6 +82,7 @@ class Main extends React.Component {
         return (
 	        <div className="main">
 				<Exit route={this.route}/>
+				<GodMod route={this.route}/>
 	        	<Menu route={this.route}/>
 	            <div className="page-content container" >
 					<ul className="nav nav-tabs" role="tablist">

@@ -1,6 +1,8 @@
 package by.tc.dnevnik.models;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -19,14 +22,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "groups")
-public class Group {
+public class Group implements Serializable{
+
+	private static final long serialVersionUID = 1071042147155741373L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY) 
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "number", /*nullable = false,*/ unique = true)
+	@Column(name = "number", unique = true)
 	private String number;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -61,10 +66,18 @@ public class Group {
 	@JoinColumn(name = "status")
 	@JsonBackReference
 	private GroupStatus status;
+	
+	@ManyToMany(mappedBy = "groups")
+	@JsonBackReference
+    private Set<Student> students;
 
 	public Group() {
 	}
 
+	public Group(Long id) {
+		this.id = id;
+	}
+	
 	public Group(String number, Course course, Date startDate, Date finishDate, String days, String time, int duration,
 			int numberOfLessons, User teacher) {
 		this.number = number;
@@ -291,6 +304,14 @@ public class Group {
 
 	public void setStatus(GroupStatus status) {
 		this.status = status;
+	}
+
+	public Set<Student> getStudents() {
+		return students;
+	}
+
+	public void setStudents(Set<Student> students) {
+		this.students = students;
 	}
 
 }

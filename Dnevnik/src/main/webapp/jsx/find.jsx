@@ -8,12 +8,13 @@ class Find extends React.Component {
 
     constructor( props ) {
         super( props );
-        this.state = {listAllGroups: [], listAllCourses: [], listAllTeachers: [], findList: []};
+        this.state = {listAllGroups: [], listAllCourses: [], listAllTeachers: [], findList: [], labelFindCount: 0};
         this.route = this.route.bind( this );
         this.getAllGroups = this.getAllGroups.bind( this );
         this.getAllCourses = this.getAllCourses.bind( this );
         this.getAllteachers = this.getAllteachers.bind( this );
         this.find = this.find.bind( this );
+        this.groupPage = this.groupPage.bind( this );
     }
     
     route(data){
@@ -25,6 +26,11 @@ class Find extends React.Component {
         this.getAllCourses(this);
         this.getAllteachers(this);
     }
+
+    groupPage(group){
+		client.setGroupId(group.id);
+		this.route( 'group' );
+	}
     
     getAllGroups(e){
         $.ajax({
@@ -77,6 +83,7 @@ class Find extends React.Component {
 			headers: client.createAuthorizationTokenHeader(),
             success: function(data){ 
                 this.setState({findList:data});
+                this.setState({labelFindCount:1});
 			}.bind(this),
 			error: function (jqXHR, textStatus, errorThrown) {
                 alert('error');
@@ -91,19 +98,19 @@ class Find extends React.Component {
                 <option value={group.number}></option>
             );
         });
-        var courses = this.state.listAllCourses.map((course)=> {
+        var coursesMap = this.state.listAllCourses.map((course)=> {
             return (
                 <option value={course.type}></option>
             );
         });
-        var teachers = this.state.listAllTeachers.map((teacher)=> {
+        var teachersMap = this.state.listAllTeachers.map((teacher)=> {
             return (
                 <option value={teacher.surname + ' ' + teacher.name + ' ' + teacher.secondName}></option>
             );
         });
-        var findList = this.state.findList.map((group)=> {
+        var findListMap = this.state.findList.map((group)=> {
             return (
-                <tr>
+                <tr onClick={()=>this.groupPage(group)}>
 			      <td>{group.number}</td>
 			      <td>{group.courseType}</td>
 			      <td>{group.startDate}</td>
@@ -132,7 +139,7 @@ class Find extends React.Component {
                                     <label className="label-find-menu">Название курса</label>
                                     <input type="text" id="course" list="courses" className="form-control"/>
                                     <datalist id="courses">
-                                       {courses}
+                                       {coursesMap}
                                     </datalist>
                                 </div>
                             </div>
@@ -141,7 +148,7 @@ class Find extends React.Component {
                                     <label className="label-find-menu">Преподаватель</label>
                                     <input type="text" id="teacher" list="teachers" className="form-control"/>
                                     <datalist id="teachers">
-                                        {teachers}
+                                        {teachersMap}
                                     </datalist>
                                 </div>
                             </div>
@@ -150,10 +157,17 @@ class Find extends React.Component {
                             <button className="btn btn-find-menu" onClick={this.find}>Найти</button>
                         </div>
                         {
-                            this.state.findList.length != 0 ?
+                            this.state.labelFindCount != 0 ?
                                 <div>
                                     <br/><br/>
-                                    <label className="label-find-menu">Найдено групп: {findList.length}</label>
+                                    <label className="label-find-menu">Найдено групп: {this.state.findList.length}</label>
+                                </div>
+                                :
+                                null
+                        }
+                        {
+                            this.state.findList.length != 0 ?
+                                <div>
                                     <table className="table table-bordered table-find-menu">
                                         <thead>
                                             <tr>
@@ -166,7 +180,7 @@ class Find extends React.Component {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {findList}
+                                            {findListMap}
                                         </tbody>
                                     </table>
                                 </div>

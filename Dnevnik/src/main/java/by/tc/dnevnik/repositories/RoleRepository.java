@@ -7,6 +7,6 @@ import by.tc.dnevnik.models.Role;
 
 
 @Repository("roleRepository")
-public interface RoleRepository  extends JpaRepository<Role, Long> {
+public interface RoleRepository extends JpaRepository<Role, Long> {
 	Role findByType(String type);
 }
