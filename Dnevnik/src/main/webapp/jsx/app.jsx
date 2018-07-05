@@ -8,6 +8,7 @@ const Main = require( './main.jsx' )
 const Group = require( './group.jsx' )
 const Find = require( './find.jsx' )
 const Admin = require( './admin/admin.jsx' )
+const Add = require( './admin/add.jsx' )
 
 ReactDOM.render((
     <BrowserRouter>
@@ -17,6 +18,7 @@ ReactDOM.render((
             <Route path="/group" component={Group} />
             <Route path="/find" component={Find} />
             <Route path="/admin" component={Admin} />
+            <Route path="/add" component={Add} />
         </div> 
     </BrowserRouter>
 ),document.getElementById( 'content' ))

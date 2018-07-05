@@ -51,7 +51,7 @@ class Admin extends React.Component {
         return (
             <div className="main">
                 <Exit route={this.route} />
-                <Menu route={this.route} />
+                <Menu route={this.route} role={'admin'}/>
                 <div className="page-content container" >
                     <table className="table table-bordered">
                         <thead>

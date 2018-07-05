@@ -46,6 +46,16 @@ class Menu extends React.Component {
                                     Поиск
                                 </a>
                             </li>
+                            {
+                                this.props.role == 'admin' ?
+                                    <li className="dropdown">
+                                        <a name="/add" onClick={this.route} className="dropdown-toggle">
+                                            Добавить
+                                        </a>
+                                    </li>
+                                    :
+                                    null
+                            }
                         </ul>
                     </nav>
                     <div id="page-content-wrapper">
